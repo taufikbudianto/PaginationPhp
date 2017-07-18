@@ -1,0 +1,57 @@
+<?php
+function get_data($url) {
+		$ch = curl_init();
+		$timeout = 5;
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER,false);
+		curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+		$data = curl_exec($ch);
+		curl_close($ch);
+		return $data;
+	}
+	
+	if ($_REQUEST['action']=='Cari'){
+            $cardno = $_REQUEST['cardno'];
+			$url="http://10.14.18.174:82/wf/inquiry.php?type=getDataHistoryByCard&cardno=".$cardno;
+            //$url="http://10.14.18.174:82/wf/getData.php?cardno=".$cardno."&type=getDataHistoryByCard";
+            $mystring = get_data($url);	
+            //echo $mystring."<br/><br/><br/>";
+            $datajson = json_decode($mystring, true);
+            echo "<table class='table table-bordered'>
+			<thead>
+            <tr>
+                <th>#</th>
+                <th>Nama</th>
+                <th>Tanggal Buat</th>
+                <th>No. Rekening</th>
+                <th>No. Kartu</th>
+                <th>Status</th>
+                <th>Prioritas</th>
+                <th>Assigned To</th>
+                <th>No Tiket</th>
+            </tr>
+            </thead>
+            <tbody>
+            ";
+            $i=1;
+            foreach ($datajson["msg"] as $key => $value) {
+                echo "<tr><td>".$i."</td>";
+                echo "<td>".$value["Nama"]."</td>";
+                echo "<td>".$value["createdtime"]."</td>";
+                echo "<td>".$value["No_Rek"]."</td>";
+                echo "<td>".$value["No_Kartu"]."</td>";
+                echo "<td>".$value["Status"]."</td>";
+                echo "<td>".$value["Priority"]."</td>";
+                echo "<td>".$value["AssignedTo"]."</td>";
+                echo "<td>".$value["TicketNo"]."</td></tr>";
+                $i++;
+            }
+            echo "</tbody></table>";
+        }else{?>
+			<p class="btn btn-default btn-outline"><h1 align="center">Section Pencarian Histori Nomor Tiket di CCBM</h1></p>
+		<?php }
+?>
